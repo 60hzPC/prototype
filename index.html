@@ -76,13 +76,13 @@
     </table>
   </div>
   <div class="footer">
-    skibidiii
+    Made with ❤️ by Your Name
   </div>
 
   <script>
-    const SPREADSHEET_ID = '1Zb-Rq78yKAh5-NgTs4f4VXFIlT-rRAqHhZy2xi0zQss';
-    const API_KEY = 'AIzaSyAKz5LFYOoki0nqbt2qrvxKDkhVQCvHmI8';
-    const SHEET_NAME = 'Sheet2'; // Use the correct sheet name
+    const SPREADSHEET_ID = '1pvazJAH8Zr7nS7aiBHW5ims5M5Qs0517jdVq3AnFv8M';
+    const API_KEY = 'AIzaSyAMJj9BlSjhbNJcmDWMs0px7jp2Z-le6Io';
+    const SHEET_NAME = 'Sheet2';
 
     async function fetchData() {
       const sheetURL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`;
@@ -95,31 +95,41 @@
           return;
         }
 
-        // Populate header section with the first row's data
         const rows = data.values;
-        const [headers, ...values] = rows;
 
-        const firstRow = values[0];
-        const userName = firstRow[0] || 'Unknown User';
-        const profilePath = firstRow[1] || 'https://via.placeholder.com/150';
-        const nfcId = firstRow[2] || 'Unknown NFC ID';
+        // Extract headers and user-specific data
+        const usernames = rows.slice(2).map(row => row[0]); // A3 onward
+        const profilePictures = rows.slice(2).map(row => row[1]); // B3 onward
+        const eventNames = rows[0].slice(3); // D1 onward (row 0, starting at column 3)
+        const eventDates = rows[1].slice(3); // D2 onward (row 1, starting at column 3)
 
-        document.getElementById('user-name').textContent = userName;
-        document.getElementById('profile-picture').src = profilePath;
-        document.getElementById('nfc-id').textContent = `NFC ID: ${nfcId}`;
+        // Select a specific user (e.g., first user in the list)
+        const selectedIndex = 0;
+        const selectedUsername = usernames[selectedIndex];
+        const selectedProfile = profilePictures[selectedIndex];
+        const eventStatuses = rows[selectedIndex + 2].slice(3); // D3 onward for the selected user
 
-        // Populate the table with event data
+        // Update header section with the selected user's details
+        document.getElementById('user-name').textContent = selectedUsername;
+        document.getElementById('profile-picture').src = selectedProfile;
+        document.getElementById('nfc-id').textContent = `NFC ID: ${selectedUsername}`;
+
+        // Populate the table with event data for the selected user
         const tableBody = document.getElementById('table-body');
-        values.forEach(row => {
+        eventNames.forEach((event, index) => {
           const tableRow = document.createElement('tr');
 
-          // Add only relevant columns (Date, Event Participated, Status)
-          const relevantData = [row[3], row[4], row[5]];
-          relevantData.forEach(cell => {
-            const tableCell = document.createElement('td');
-            tableCell.textContent = cell || '';
-            tableRow.appendChild(tableCell);
-          });
+          const dateCell = document.createElement('td');
+          dateCell.textContent = eventDates[index] || '';
+          tableRow.appendChild(dateCell);
+
+          const eventCell = document.createElement('td');
+          eventCell.textContent = event || '';
+          tableRow.appendChild(eventCell);
+
+          const statusCell = document.createElement('td');
+          statusCell.textContent = eventStatuses[index] || '';
+          tableRow.appendChild(statusCell);
 
           tableBody.appendChild(tableRow);
         });
