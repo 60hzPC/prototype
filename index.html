@@ -65,8 +65,6 @@
     <table>
       <thead>
         <tr>
-          <th>User Name</th>
-          <th>NFC ID</th>
           <th>Date</th>
           <th>Event Participated</th>
           <th>Status</th>
@@ -78,12 +76,12 @@
     </table>
   </div>
   <div class="footer">
-    Made with ❤️ by Your Name
+    skibidiii
   </div>
 
   <script>
-    const SPREADSHEET_ID = '1pvazJAH8Zr7nS7aiBHW5ims5M5Qs0517jdVq3AnFv8M';
-    const API_KEY = 'AIzaSyAMJj9BlSjhbNJcmDWMs0px7jp2Z-le6Io';
+    const SPREADSHEET_ID = '1Zb-Rq78yKAh5-NgTs4f4VXFIlT-rRAqHhZy2xi0zQss';
+    const API_KEY = 'AIzaSyAKz5LFYOoki0nqbt2qrvxKDkhVQCvHmI8';
     const SHEET_NAME = 'Sheet2'; // Use the correct sheet name
 
     async function fetchData() {
@@ -115,8 +113,8 @@
         values.forEach(row => {
           const tableRow = document.createElement('tr');
 
-          // Add only relevant columns (skip the "User Profile Path")
-          const relevantData = [row[0], row[2], row[3], row[4], row[5]];
+          // Add only relevant columns (Date, Event Participated, Status)
+          const relevantData = [row[3], row[4], row[5]];
           relevantData.forEach(cell => {
             const tableCell = document.createElement('td');
             tableCell.textContent = cell || '';
