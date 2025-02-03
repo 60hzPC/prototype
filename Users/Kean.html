@@ -97,17 +97,17 @@
 
         const rows = data.values;
 
-        // Extract headers and user-specific data
-        const usernames = rows.slice(2).map(row => row[0]); // A3 onward
-        const profilePictures = rows.slice(2).map(row => row[1]); // B3 onward
-        const eventNames = rows[0].slice(3); // D1 onward (row 0, starting at column 3)
-        const eventDates = rows[1].slice(3); // D2 onward (row 1, starting at column 3)
+const usernames = rows.slice(3).map(row => row[0]); // A4 onward
+const profilePictures = rows.slice(3).map(row => row[1]); // B4 onward (aligned with usernames)
+const eventNames = rows[0].slice(3); // D1 onward (row 0, starting at column 3)
+const eventDates = rows[1].slice(3); // D2 onward (row 1, starting at column 3)
 
-        // Select a specific user (e.g., first user in the list)
-        const selectedIndex = 0;
-        const selectedUsername = usernames[selectedIndex];
-        const selectedProfile = profilePictures[selectedIndex];
-        const eventStatuses = rows[selectedIndex + 2].slice(3); // D3 onward for the selected user
+// Select a specific user (e.g., first user in the list)
+const selectedIndex = 0;
+const selectedUsername = usernames[selectedIndex];
+const selectedProfile = profilePictures[selectedIndex];
+const eventStatuses = rows[selectedIndex + 3].slice(3); // D4 onward for the selected user
+
 
         // Update header section with the selected user's details
         document.getElementById('user-name').textContent = selectedUsername;
