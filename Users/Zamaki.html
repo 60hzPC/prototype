@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital NFC Activity Passport</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      background-color: #003366;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .header img {
+      border-radius: 50%;
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border: 5px solid white;
+    }
+    .header h1 {
+      margin: 10px 0;
+    }
+    .events {
+      padding: 20px;
+    }
+    .events h2 {
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #003366;
+      color: white;
+    }
+    .footer {
+      background-color: #003366;
+      color: white;
+      text-align: center;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img id="profile-picture" src="https://via.placeholder.com/150" alt="User Profile Picture">
+    <h1 id="user-name">User Name</h1>
+    <p id="nfc-id">NFC ID: 12345678</p>
+  </div>
+  <div class="events">
+    <h2>Events</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Event Participated</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <!-- Data rows will be inserted here -->
+      </tbody>
+    </table>
+  </div>
+  <div class="footer">
+    skibidi code corp.
+  </div>
+
+  <script>
+    const SPREADSHEET_ID = '1Zb-Rq78yKAh5-NgTs4f4VXFIlT-rRAqHhZy2xi0zQss';
+    const API_KEY = 'AIzaSyAMJj9BlSjhbNJcmDWMs0px7jp2Z-le6Io';
+    const SHEET_NAME = 'Sheet2';
+
+    async function fetchData() {
+      const sheetURL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`;
+      try {
+        const response = await fetch(sheetURL);
+        const data = await response.json();
+
+        if (!data.values) {
+          console.error('No data found in the sheet.');
+          return;
+        }
+
+        const rows = data.values;
+
+        // Extract headers and user-specific data
+        const usernames = rows.slice(2).map(row => row[0]); // A3 onward
+        const profilePictures = rows.slice(2).map(row => row[1]); // B3 onward
+        const eventNames = rows[0].slice(3); // D1 onward (row 0, starting at column 3)
+        const eventDates = rows[1].slice(3); // D2 onward (row 1, starting at column 3)
+
+        // Select a specific user (e.g., first user in the list)
+        const selectedIndex = 0;
+        const selectedUsername = usernames[selectedIndex];
+        const selectedProfile = profilePictures[selectedIndex];
+        const eventStatuses = rows[selectedIndex + 2].slice(3); // D3 onward for the selected user
+
+        // Update header section with the selected user's details
+        document.getElementById('user-name').textContent = selectedUsername;
+        document.getElementById('profile-picture').src = selectedProfile;
+        document.getElementById('nfc-id').textContent = `NFC ID: ${selectedUsername}`;
+
+        // Populate the table with event data for the selected user
+        const tableBody = document.getElementById('table-body');
+        eventNames.forEach((event, index) => {
+          const tableRow = document.createElement('tr');
+
+          const dateCell = document.createElement('td');
+          dateCell.textContent = eventDates[index] || '';
+          tableRow.appendChild(dateCell);
+
+          const eventCell = document.createElement('td');
+          eventCell.textContent = event || '';
+          tableRow.appendChild(eventCell);
+
+          const statusCell = document.createElement('td');
+          statusCell.textContent = eventStatuses[index] || '';
+          tableRow.appendChild(statusCell);
+
+          tableBody.appendChild(tableRow);
+        });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
+
+    // Fetch data on page load
+    fetchData();
+  </script>
+</body>
+</html>
