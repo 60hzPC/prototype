@@ -98,7 +98,7 @@
         const rows = data.values;
 
         // Extract headers and user-specific data
-        const usernames = rows.slice(2).map(row => row[0]); // A3 onward
+        const usernames = rows.slice(4).map(row => row[0]); // A3 onward
         const profilePictures = rows.slice(2).map(row => row[1]); // B3 onward
         const eventNames = rows[0].slice(3); // D1 onward (row 0, starting at column 3)
         const eventDates = rows[1].slice(3); // D2 onward (row 1, starting at column 3)
@@ -107,7 +107,7 @@
         const selectedIndex = 0;
         const selectedUsername = usernames[selectedIndex];
         const selectedProfile = profilePictures[selectedIndex];
-        const eventStatuses = rows[selectedIndex + 2].slice(3); // D3 onward for the selected user
+        const eventStatuses = rows[selectedIndex + 4].slice(3); // D3 onward for the selected user
 
         // Update header section with the selected user's details
         document.getElementById('user-name').textContent = selectedUsername;
