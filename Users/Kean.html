@@ -2,83 +2,153 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Digital NFC Activity Passport</title>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <!-- Retro Pixel Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
+      background: linear-gradient(135deg, #2A5B3B, #3D6C45, #5A7C54); /* Darker, vibrant Minecraft-inspired green tones */
+      color: rgb(255, 255, 255);
+      font-family: 'Press Start 2P', cursive;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
     }
-    .header {
-      background-color: #003366;
-      color: white;
-      padding: 20px;
+    
+    .profile-card {
+      background: rgba(0, 0, 0, 0.6); /* Darker background for shine effect */
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.6); /* Shiny shadow */
       text-align: center;
+      backdrop-filter: blur(10px);
+      transition: 0.3s;
     }
-    .header img {
+    
+    .profile-card:hover {
+      box-shadow: 0px 12px 25px rgba(0, 0, 0, 0.8);
+    }
+  
+    #nfc-id {
+      color: rgb(53, 167, 89) !important; /* Make NFC ID text white */
+    }
+
+    .profile-img {
       border-radius: 50%;
-      width: 150px;
-      height: 150px;
+      width: 140px;
+      height: 140px;
       object-fit: cover;
-      border: 5px solid white;
+      border: .5px solid rgb(255, 255, 255);
+      box-shadow: 0px 4px 8px rgba(255, 255, 255, 0.4);
     }
-    .header h1 {
-      margin: 10px 0;
+    
+    .navbar {
+      background-color: rgba(0, 0, 0, 0.6) !important;
+      backdrop-filter: blur(10px);
+      box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.7);
     }
-    .events {
-      padding: 20px;
+    
+    .navbar-brand {
+      color: white !important;
+      font-weight: bold;
     }
-    .events h2 {
-      margin-bottom: 20px;
+    
+    .table {
+      background: rgba(0, 0, 0, 0.5); /* Darker, shinier table background */
+      color: #FAF5DC;
+      border-radius: 10px;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 20px;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: center;
-    }
-    th {
-      background-color: #003366;
+    
+    .table th {
+      background-color: #2B5C38; /* Minecraft dirt block-like green */
       color: white;
     }
+    
+    .table-hover tbody tr:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    
     .footer {
-      background-color: #003366;
-      color: white;
+      background: rgba(0, 0, 0, 0.4);
       text-align: center;
-      padding: 10px;
+      padding: 15px;
+      margin-top: 20px;
+      box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.5);
+    }
+    
+    .dark-mode {
+      background: linear-gradient(135deg, #1A2B1D, #2F4A29) !important;
+      color: #f8f9fa !important;
+    }
+    
+    .toggle-dark {
+      position: absolute;
+      right: 20px;
+      top: 15px;
+      cursor: pointer;
+      font-size: 24px;
+      color: white;
+      transition: 0.3s;
+    }
+    
+    .toggle-dark:hover {
+      color: #FFD700;
     }
   </style>
+  
 </head>
 <body>
-  <div class="header">
-    <img id="profile-picture" src="https://via.placeholder.com/150" alt="User Profile Picture">
-    <h1 id="user-name">User Name</h1>
-    <p id="nfc-id">NFC ID: 12345678</p>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="#">Digital NFC Passport</a>
+      <i class="fas fa-moon toggle-dark" onclick="toggleDarkMode()"></i>
+    </div>
+  </nav>
+
+  <!-- Profile Section -->
+  <div class="container mt-4">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="profile-card">
+          <img id="profile-picture" src="https://via.placeholder.com/150" alt="User Profile" class="profile-img">
+          <h2 id="user-name" class="mt-3">User Name</h2>
+          <p id="nfc-id" class="text-muted">NFC ID: 12345678</p>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="events">
-    <h2>Events</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Event Participated</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody id="table-body">
-        <!-- Data rows will be inserted here -->
-      </tbody>
-    </table>
+
+  <!-- Events Table -->
+  <div class="container mt-4">
+    <h2 class="text-center">Events</h2>
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Event Participated</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+          <!-- Data rows will be inserted here -->
+        </tbody>
+      </table>
+    </div>
   </div>
+
+  <!-- Footer -->
   <div class="footer">
     skibidi code corp.
   </div>
 
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     const SPREADSHEET_ID = '1Zb-Rq78yKAh5-NgTs4f4VXFIlT-rRAqHhZy2xi0zQss';
     const API_KEY = 'AIzaSyAMJj9BlSjhbNJcmDWMs0px7jp2Z-le6Io';
@@ -96,26 +166,23 @@
         }
 
         const rows = data.values;
+        const usernames = rows.slice(3).map(row => row[0]);
+        const profilePictures = rows.slice(3).map(row => row[1]);
+        const eventNames = rows[0].slice(3);
+        const eventDates = rows[1].slice(3);
 
-const usernames = rows.slice(3).map(row => row[0]); // A4 onward
-const profilePictures = rows.slice(3).map(row => row[1]); // B4 onward (aligned with usernames)
-const eventNames = rows[0].slice(3); // D1 onward (row 0, starting at column 3)
-const eventDates = rows[1].slice(3); // D2 onward (row 1, starting at column 3)
+        const selectedIndex = 0;
+        const selectedUsername = usernames[selectedIndex];
+        const selectedProfile = profilePictures[selectedIndex];
+        const eventStatuses = rows[selectedIndex + 3].slice(3);
 
-// Select a specific user (e.g., first user in the list)
-const selectedIndex = 0;
-const selectedUsername = usernames[selectedIndex];
-const selectedProfile = profilePictures[selectedIndex];
-const eventStatuses = rows[selectedIndex + 3].slice(3); // D4 onward for the selected user
-
-
-        // Update header section with the selected user's details
         document.getElementById('user-name').textContent = selectedUsername;
         document.getElementById('profile-picture').src = selectedProfile;
         document.getElementById('nfc-id').textContent = `NFC ID: ${selectedUsername}`;
 
-        // Populate the table with event data for the selected user
         const tableBody = document.getElementById('table-body');
+        tableBody.innerHTML = '';
+
         eventNames.forEach((event, index) => {
           const tableRow = document.createElement('tr');
 
@@ -137,8 +204,11 @@ const eventStatuses = rows[selectedIndex + 3].slice(3); // D4 onward for the sel
         console.error('Error fetching data:', error);
       }
     }
+    
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+    }
 
-    // Fetch data on page load
     fetchData();
   </script>
 </body>
