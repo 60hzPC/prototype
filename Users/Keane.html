@@ -13,22 +13,25 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f9fafb;
+      background: linear-gradient(135deg, #e0f7fa, #f9fafb);
       margin: 0;
       padding: 0;
+      color: #333;
     }
 
     .container {
       max-width: 100%;
       padding: 20px;
       background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      margin: 30px auto;
     }
 
     .profile-header {
       text-align: center;
-      padding: 10px;
+      padding: 20px 10px;
+      position: relative;
     }
 
     .profile-header img {
@@ -36,13 +39,18 @@
       width: 140px;
       height: 140px;
       object-fit: cover;
-      border: 3px solid cyan;
-      box-shadow: 0px 0px 15px cyan;
+      border: 4px solid #87CEEB; /* skyblue border */
+      box-shadow: 0 6px 18px rgba(135, 206, 235, 0.6); /* dynamic skyblue shadow */
+      transition: transform 0.3s ease;
+    }
+    .profile-header img:hover {
+      transform: scale(1.05);
     }
 
     .profile-header h2 {
       margin-top: 15px;
       color: #1a1a2e;
+      font-family: 'Orbitron', sans-serif;
     }
 
     .profile-header p {
@@ -52,62 +60,88 @@
 
     .badges span {
       display: inline-block;
-      padding: 5px 10px;
-      margin: 2px;
-      border-radius: 5px;
+      padding: 7px 12px;
+      margin: 4px;
+      border-radius: 20px;
       font-size: 12px;
       font-weight: bold;
+      transition: all 0.3s ease;
     }
-
-    .badge-default { background: gray; color: white; }
-    .badge-secondary { background: blue; color: white; }
-    .badge-outline { border: 1px solid rgb(220, 206, 206); color: rgb(224, 209, 209); }
+    .badge-default {
+      background: #6c757d;
+      color: white;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+    .badge-secondary {
+      background: #87CEEB;
+      color: white;
+      box-shadow: 0 4px 10px rgba(135, 206, 235, 0.5);
+    }
+    .badge-outline {
+      border: 2px solid #87CEEB;
+      color: #87CEEB;
+      background: transparent;
+      box-shadow: 0 4px 10px rgba(135, 206, 235, 0.3);
+    }
 
     .stats {
       display: flex;
       justify-content: center;
-      gap: 15px;
-      margin-top: 10px;
+      gap: 20px;
+      margin-top: 20px;
       flex-wrap: wrap;
     }
 
     .stats div {
-      background: lightgray;
-      padding: 10px;
-      border-radius: 5px;
+      background: linear-gradient(145deg, #e6f7ff, #ffffff);
+      padding: 15px 20px;
+      border-radius: 10px;
+      box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1),
+                  -4px -4px 8px rgba(255, 255, 255, 0.7);
+      transition: transform 0.2s ease;
+    }
+    .stats div:hover {
+      transform: translateY(-5px);
     }
 
     .events-table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
+      margin-top: 30px;
     }
 
     .events-table th, .events-table td {
       border: 1px solid #ddd;
-      padding: 10px;
+      padding: 12px;
       text-align: left;
     }
 
     .events-table th {
       background: #f4f4f4;
+      font-weight: bold;
+    }
+
+    .events-table tr:hover {
+      background: #f1faff;
     }
 
     .footer {
-      background: rgba(202, 195, 195, 0.8);
+      background: linear-gradient(145deg, #d0ebff, #ffffff);
       text-align: center;
-      padding: 15px;
-      margin-top: 30px;
-      box-shadow: 0px -4px 10px rgba(0, 183, 255, 0.5);
+      padding: 20px;
+      margin-top: 40px;
+      border-radius: 12px;
+      box-shadow: 0 -8px 20px rgba(135, 206, 235, 0.4);
+      font-weight: bold;
     }
 
-    /* Make tables responsive on mobile */
+    /* Responsive tables and elements */
     @media (max-width: 767px) {
       .events-table, .stats {
         font-size: 14px;
       }
       .profile-header h2 {
-        font-size: 18px;
+        font-size: 20px;
       }
     }
   </style>
@@ -160,72 +194,72 @@
     const SHEET_NAME = 'Sheet2';
 
     async function fetchData() {
-        const sheetURL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`;
-        try {
-          const response = await fetch(sheetURL);
-          const data = await response.json();
-      
-          if (!data.values) {
-            console.error('No data found in the sheet.');
-            return;
-          }
-      
-          const rows = data.values;
-      
-          // Extract user data
-          const usernames = rows.slice(3).map(row => row[2]); // Assuming names are in column C (index 2)
-          const profilePictures = rows.slice(3).map(row => row[3]); // Assuming profile pics in column D (index 3)
-          const completedCounts = rows.slice(3).map(row => row[0]); // "Completed" is in Column A (index 0)
-          const absentCounts = rows.slice(3).map(row => row[1]); // "Absent" is in Column B (index 1)
-          const eventNames = rows[0].slice(5); // Extract event names
-          const eventDates = rows[1].slice(5); // Extract event dates
-      
-          // Select the first user for now (Modify if dynamic selection is needed)
-          const selectedIndex = 0;
-          const selectedUsername = usernames[selectedIndex];
-          const selectedProfile = profilePictures[selectedIndex];
-          const completedEvents = completedCounts[selectedIndex] || 0;
-          const absentEvents = absentCounts[selectedIndex] || 0;
-          const eventStatuses = rows[selectedIndex + 3].slice(5);
-      
-          // Update profile data
-          document.getElementById('user-name').textContent = selectedUsername;
-          document.getElementById('profile-picture').src = selectedProfile;
-      
-          // Update stats
-          document.querySelector(".stats div:nth-child(1)").innerHTML = `<strong>Events:</strong> ${eventNames.length}`;
-          document.querySelector(".stats div:nth-child(2)").innerHTML = `<strong>Completed:</strong> ${completedEvents}`;
-          document.querySelector(".stats div:nth-child(3)").innerHTML = `<strong>Absent:</strong> ${absentEvents}`;
-      
-          // Populate event table
-          const tableBody = document.getElementById('table-body');
-          tableBody.innerHTML = '';
-      
-          eventNames.forEach((event, index) => {
-            const tableRow = document.createElement('tr');
-      
-            const eventCell = document.createElement('td');
-            eventCell.textContent = event || '';
-            tableRow.appendChild(eventCell);
-      
-            const dateCell = document.createElement('td');
-            dateCell.textContent = eventDates[index] || '';
-            tableRow.appendChild(dateCell);
-      
-            const statusCell = document.createElement('td');
-            statusCell.textContent = eventStatuses[index] || '';
-            tableRow.appendChild(statusCell);
-      
-            tableBody.appendChild(tableRow);
-          });
-      
-        } catch (error) {
-          console.error('Error fetching data:', error);
+      const sheetURL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`;
+      try {
+        const response = await fetch(sheetURL);
+        const data = await response.json();
+    
+        if (!data.values) {
+          console.error('No data found in the sheet.');
+          return;
         }
+    
+        const rows = data.values;
+    
+        // Extract user data
+        const usernames = rows.slice(3).map(row => row[2]); // Assuming names are in column C (index 2)
+        const profilePictures = rows.slice(3).map(row => row[3]); // Assuming profile pics in column D (index 3)
+        const completedCounts = rows.slice(3).map(row => row[0]); // "Completed" is in Column A (index 0)
+        const absentCounts = rows.slice(3).map(row => row[1]); // "Absent" is in Column B (index 1)
+        const eventNames = rows[0].slice(5); // Extract event names
+        const eventDates = rows[1].slice(5); // Extract event dates
+    
+        // Select the first user for now (Modify if dynamic selection is needed)
+        const selectedIndex = 0;
+        const selectedUsername = usernames[selectedIndex];
+        const selectedProfile = profilePictures[selectedIndex];
+        const completedEvents = completedCounts[selectedIndex] || 0;
+        const absentEvents = absentCounts[selectedIndex] || 0;
+        const eventStatuses = rows[selectedIndex + 3].slice(5);
+    
+        // Update profile data
+        document.getElementById('user-name').textContent = selectedUsername;
+        document.getElementById('profile-picture').src = selectedProfile;
+    
+        // Update stats
+        document.querySelector(".stats div:nth-child(1)").innerHTML = `<strong>Events:</strong> ${eventNames.length}`;
+        document.querySelector(".stats div:nth-child(2)").innerHTML = `<strong>Completed:</strong> ${completedEvents}`;
+        document.querySelector(".stats div:nth-child(3)").innerHTML = `<strong>Absent:</strong> ${absentEvents}`;
+    
+        // Populate event table
+        const tableBody = document.getElementById('table-body');
+        tableBody.innerHTML = '';
+    
+        eventNames.forEach((event, index) => {
+          const tableRow = document.createElement('tr');
+    
+          const eventCell = document.createElement('td');
+          eventCell.textContent = event || '';
+          tableRow.appendChild(eventCell);
+    
+          const dateCell = document.createElement('td');
+          dateCell.textContent = eventDates[index] || '';
+          tableRow.appendChild(dateCell);
+    
+          const statusCell = document.createElement('td');
+          statusCell.textContent = eventStatuses[index] || '';
+          tableRow.appendChild(statusCell);
+    
+          tableBody.appendChild(tableRow);
+        });
+    
+      } catch (error) {
+        console.error('Error fetching data:', error);
       }
-      
-      fetchData();
-      
+    }
+    
+    fetchData();
+    
   </script>
 </body>
 </html>
