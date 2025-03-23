@@ -3,117 +3,163 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Digital NFC Passport</title>
+  <title>Digital NFC Activity Passport</title>
   
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-  
+  <!-- Futuristic Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
   <style>
     body {
-      background: linear-gradient(135deg, #0d1b2a, #1b263b, #415a77); /* Darker blue futuristic theme */
-      color: #ffffff;
+      background: radial-gradient(circle, #1a1a2e, #16213e);
+      color: white;
       font-family: 'Orbitron', sans-serif;
-      text-align: center;
     }
     
     .profile-card {
       background: rgba(255, 255, 255, 0.1);
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0px 10px 25px rgba(255, 255, 255, 0.2);
-      transition: 0.3s;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0px 10px 25px rgba(0, 183, 255, 0.5);
+      text-align: center;
+      backdrop-filter: blur(10px);
     }
     
-    .profile-card:hover {
-      box-shadow: 0px 12px 30px rgba(255, 255, 255, 0.3);
-    }
-
     .profile-img {
       border-radius: 50%;
-      width: 120px;
-      height: 120px;
+      width: 140px;
+      height: 140px;
       object-fit: cover;
-      border: 2px solid #ffffff;
-    }
-
-    .navbar {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 15px;
-      box-shadow: 0px 5px 15px rgba(255, 255, 255, 0.2);
+      border: 3px solid cyan;
+      box-shadow: 0px 0px 15px cyan;
     }
     
-    .navbar-brand {
-      font-weight: bold;
-      color: #ffffff !important;
+    .navbar {
+      background: rgba(0, 0, 0, 0.8);
+      box-shadow: 0px 5px 15px rgba(0, 183, 255, 0.6);
     }
-
+    
     .table {
-      background: rgba(255, 255, 255, 0.1);
-      color: #ffffff;
-      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      color: white;
     }
-
+    
     .table th {
-      background: #415a77;
-      color: #ffffff;
+      background-color: rgba(0, 183, 255, 0.7);
+      color: white;
+    }
+    
+    .table-hover tbody tr:hover {
+      background-color: rgba(0, 183, 255, 0.3);
     }
     
     .footer {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.8);
+      text-align: center;
       padding: 15px;
-      margin-top: 20px;
-    }
-    
-    .dark-mode {
-      background: linear-gradient(135deg, #000000, #1a1a1a) !important;
+      box-shadow: 0px -4px 10px rgba(0, 183, 255, 0.5);
     }
   </style>
 </head>
 <body>
+  
   <nav class="navbar navbar-expand-lg">
     <div class="container">
-      <a class="navbar-brand" href="#">Digital NFC Passport</a>
+      <a class="navbar-brand text-white" href="#">Digital NFC Passport</a>
     </div>
   </nav>
-
-  <div class="container mt-5">
+  
+  <div class="container mt-4">
     <div class="row justify-content-center">
       <div class="col-md-6">
         <div class="profile-card">
           <img id="profile-picture" src="https://via.placeholder.com/150" alt="User Profile" class="profile-img">
-          <h3 id="user-name" class="mt-3">User Name</h3>
+          <h2 id="user-name" class="mt-3">User Name</h2>
           <p id="nfc-id">NFC ID: 12345678</p>
         </div>
       </div>
     </div>
   </div>
-
+  
   <div class="container mt-4">
-    <h2>Events</h2>
+    <h2 class="text-center">Events</h2>
     <div class="table-responsive">
-      <table class="table table-hover">
+      <table class="table table-bordered table-hover">
         <thead>
           <tr>
             <th>Date</th>
-            <th>Event</th>
+            <th>Event Participated</th>
             <th>Status</th>
           </tr>
         </thead>
         <tbody id="table-body">
-          <!-- Data Rows Inserted Here -->
         </tbody>
       </table>
     </div>
   </div>
-
+  
   <div class="footer">
-    skibidi code corp.
+    Skibidi Code Corp.
   </div>
-
+  
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    const SPREADSHEET_ID = '1Zb-Rq78yKAh5-NgTs4f4VXFIlT-rRAqHhZy2xi0zQss';
+    const API_KEY = 'AIzaSyAMJj9BlSjhbNJcmDWMs0px7jp2Z-le6Io';
+    const SHEET_NAME = 'Sheet2';
+
+    async function fetchData() {
+      const sheetURL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`;
+      try {
+        const response = await fetch(sheetURL);
+        const data = await response.json();
+
+        if (!data.values) {
+          console.error('No data found in the sheet.');
+          return;
+        }
+
+        const rows = data.values;
+        const usernames = rows.slice(3).map(row => row[0]);
+        const profilePictures = rows.slice(3).map(row => row[1]);
+        const eventNames = rows[0].slice(3);
+        const eventDates = rows[1].slice(3);
+
+        const selectedIndex = 0;
+        const selectedUsername = usernames[selectedIndex];
+        const selectedProfile = profilePictures[selectedIndex];
+        const eventStatuses = rows[selectedIndex + 3].slice(3);
+
+        document.getElementById('user-name').textContent = selectedUsername;
+        document.getElementById('profile-picture').src = selectedProfile;
+        document.getElementById('nfc-id').textContent = `NFC ID: ${selectedUsername}`;
+
+        const tableBody = document.getElementById('table-body');
+        tableBody.innerHTML = '';
+
+        eventNames.forEach((event, index) => {
+          const tableRow = document.createElement('tr');
+
+          const dateCell = document.createElement('td');
+          dateCell.textContent = eventDates[index] || '';
+          tableRow.appendChild(dateCell);
+
+          const eventCell = document.createElement('td');
+          eventCell.textContent = event || '';
+          tableRow.appendChild(eventCell);
+
+          const statusCell = document.createElement('td');
+          statusCell.textContent = eventStatuses[index] || '';
+          tableRow.appendChild(statusCell);
+
+          tableBody.appendChild(tableRow);
+        });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
+
     fetchData();
   </script>
 </body>
