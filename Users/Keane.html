@@ -131,7 +131,7 @@
       <div class="stats">
         <div><strong>Events:</strong> 32</div>
         <div><strong>Completed:</strong> 24</div>
-        <div><strong>Pending:</strong> 8</div>
+        <div><strong>Absent:</strong> 8</div>
       </div>
     </div>
 
@@ -160,57 +160,73 @@
     const SHEET_NAME = 'Sheet2';
 
     async function fetchData() {
-      const sheetURL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`;
-      try {
-        const response = await fetch(sheetURL);
-        const data = await response.json();
-
-        if (!data.values) {
-          console.error('No data found in the sheet.');
-          return;
+        const sheetURL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`;
+        try {
+          const response = await fetch(sheetURL);
+          const data = await response.json();
+      
+          if (!data.values) {
+            console.error('No data found in the sheet.');
+            return;
+          }
+      
+          const rows = data.values;
+      
+          // Extract user data
+          const usernames = rows.slice(3).map(row => row[2]); // Assuming names are in column C (index 2)
+          const profilePictures = rows.slice(3).map(row => row[3]); // Assuming profile pics in column D (index 3)
+          const completedCounts = rows.slice(3).map(row => row[0]); // "Completed" is in Column A (index 0)
+          const absentCounts = rows.slice(3).map(row => row[1]); // "Absent" is in Column B (index 1)
+          const eventNames = rows[0].slice(5); // Extract event names
+          const eventDates = rows[1].slice(5); // Extract event dates
+      
+          // Select the first user for now (Modify if dynamic selection is needed)
+          const selectedIndex = 0;
+          const selectedUsername = usernames[selectedIndex];
+          const selectedProfile = profilePictures[selectedIndex];
+          const completedEvents = completedCounts[selectedIndex] || 0;
+          const absentEvents = absentCounts[selectedIndex] || 0;
+          const eventStatuses = rows[selectedIndex + 3].slice(5);
+      
+          // Update profile data
+          document.getElementById('user-name').textContent = selectedUsername;
+          document.getElementById('profile-picture').src = selectedProfile;
+          document.getElementById('nfc-id').textContent = `NFC ID: ${selectedUsername}`;
+      
+          // Update stats
+          document.querySelector(".stats div:nth-child(1)").innerHTML = `<strong>Events:</strong> ${eventNames.length}`;
+          document.querySelector(".stats div:nth-child(2)").innerHTML = `<strong>Completed:</strong> ${completedEvents}`;
+          document.querySelector(".stats div:nth-child(3)").innerHTML = `<strong>Absent:</strong> ${absentEvents}`;
+      
+          // Populate event table
+          const tableBody = document.getElementById('table-body');
+          tableBody.innerHTML = '';
+      
+          eventNames.forEach((event, index) => {
+            const tableRow = document.createElement('tr');
+      
+            const eventCell = document.createElement('td');
+            eventCell.textContent = event || '';
+            tableRow.appendChild(eventCell);
+      
+            const dateCell = document.createElement('td');
+            dateCell.textContent = eventDates[index] || '';
+            tableRow.appendChild(dateCell);
+      
+            const statusCell = document.createElement('td');
+            statusCell.textContent = eventStatuses[index] || '';
+            tableRow.appendChild(statusCell);
+      
+            tableBody.appendChild(tableRow);
+          });
+      
+        } catch (error) {
+          console.error('Error fetching data:', error);
         }
-
-        const rows = data.values;
-        const usernames = rows.slice(2).map(row => row[0]);
-        const profilePictures = rows.slice(3).map(row => row[1]);
-        const eventNames = rows[0].slice(3);
-        const eventDates = rows[1].slice(3);
-
-        const selectedIndex = 0;
-        const selectedUsername = usernames[selectedIndex];
-        const selectedProfile = profilePictures[selectedIndex];
-        const eventStatuses = rows[selectedIndex + 3].slice(3);
-
-        document.getElementById('user-name').textContent = selectedUsername;
-        document.getElementById('profile-picture').src = selectedProfile;
-        document.getElementById('nfc-id').textContent = `NFC ID: ${selectedUsername}`;
-
-        const tableBody = document.getElementById('table-body');
-        tableBody.innerHTML = '';
-
-        eventNames.forEach((event, index) => {
-          const tableRow = document.createElement('tr');
-
-          const eventCell = document.createElement('td');
-          eventCell.textContent = event || '';
-          tableRow.appendChild(eventCell);
-
-          const dateCell = document.createElement('td');
-          dateCell.textContent = eventDates[index] || '';
-          tableRow.appendChild(dateCell);
-
-          const statusCell = document.createElement('td');
-          statusCell.textContent = eventStatuses[index] || '';
-          tableRow.appendChild(statusCell);
-
-          tableBody.appendChild(tableRow);
-        });
-      } catch (error) {
-        console.error('Error fetching data:', error);
       }
-    }
-
-    fetchData();
+      
+      fetchData();
+      
   </script>
 </body>
 </html>
