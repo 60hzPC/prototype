@@ -39,8 +39,8 @@
       width: 140px;
       height: 140px;
       object-fit: cover;
-      border: 4px solid #87CEEB; /* skyblue border */
-      box-shadow: 0 6px 18px rgba(135, 206, 235, 0.6); /* dynamic skyblue shadow */
+      border: 4px solid #87CEEB;
+      box-shadow: 0 6px 18px rgba(135, 206, 235, 0.6);
       transition: transform 0.3s ease;
     }
     .profile-header img:hover {
@@ -163,9 +163,9 @@
       </div>
       
       <div class="stats">
-        <div><strong>Events:</strong> 32</div>
-        <div><strong>Completed:</strong> 24</div>
-        <div><strong>Absent:</strong> 8</div>
+        <div><strong>Events:</strong> 0</div>
+        <div><strong>Completed:</strong> 0</div>
+        <div><strong>Absent:</strong> 0</div>
       </div>
     </div>
 
@@ -194,85 +194,50 @@
     const SHEET_NAME = 'Sheet2';
 
     async function fetchData() {
-        const sheetURL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`;
-        try {
-          const response = await fetch(sheetURL);
-          const data = await response.json();
-      
-          if (!data.values) {
-            console.error('No data found in the sheet.');
-            return;
-          }
-      
-          const rows = data.values;
-      
-          // Find user row dynamically
-          const usernameToFind = "Zamaki";
-          let selectedIndex = -1;
-      
-          for (let i = 2; i < rows.length; i++) { // Start at row index 2
-            if (rows[i][2] === usernameToFind) {  // Column C (index 2)
-              selectedIndex = i;
-              break;
-            }
-          }
-      
-          if (selectedIndex === -1) {
-            console.error('User not found in the sheet.');
-            return;
-          }
-      
-          // Extract user data
-          const selectedRow = rows[selectedIndex];
-          const selectedUsername = selectedRow[2]; // Name in Column C
-          const selectedProfile = selectedRow[3];  // Profile picture in Column D
-          const completedEvents = selectedRow[0] || 0; // Column A (Completed)
-          const absentEvents = selectedRow[1] || 0; // Column B (Absent)
-          const eventStatuses = selectedRow.slice(5); // Events start at Column F (Index 5)
-      
-          // Event headers (names & dates)
-          const eventNames = rows[0].slice(5); // First row, starting from Column F
-          const eventDates = rows[1].slice(5); // Second row, starting from Column F
-      
-          // Update profile data
-          document.getElementById('user-name').textContent = selectedUsername;
-          document.getElementById('profile-picture').src = selectedProfile;
-      
-          // Update stats
-          document.querySelector(".stats div:nth-child(1)").innerHTML = `<strong>Events:</strong> ${eventNames.length}`;
-          document.querySelector(".stats div:nth-child(2)").innerHTML = `<strong>Completed:</strong> ${completedEvents}`;
-          document.querySelector(".stats div:nth-child(3)").innerHTML = `<strong>Absent:</strong> ${absentEvents}`;
-      
-          // Populate event table
-          const tableBody = document.getElementById('table-body');
-          tableBody.innerHTML = '';
-      
-          eventNames.forEach((event, index) => {
-            const tableRow = document.createElement('tr');
-      
-            const eventCell = document.createElement('td');
-            eventCell.textContent = event || '';
-            tableRow.appendChild(eventCell);
-      
-            const dateCell = document.createElement('td');
-            dateCell.textContent = eventDates[index] || '';
-            tableRow.appendChild(dateCell);
-      
-            const statusCell = document.createElement('td');
-            statusCell.textContent = eventStatuses[index] || ' ';
-            tableRow.appendChild(statusCell);
-      
-            tableBody.appendChild(tableRow);
-          });
-      
-        } catch (error) {
-          console.error('Error fetching data:', error);
+      const sheetURL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`;
+      try {
+        const response = await fetch(sheetURL);
+        const data = await response.json();
+
+        if (!data.values) {
+          console.error('No data found in the sheet.');
+          return;
         }
+
+        const rows = data.values;
+
+        // Extract user data from specific cells
+        const selectedUsername = rows[3][2]; // C3
+        const selectedProfile = rows[3][3]; // D3
+        const eventStatuses = rows[3].slice(5); // Attendance statuses from F3 onwards
+
+        const eventNames = rows[0].slice(5);
+        const eventDates = rows[1].slice(5);
+
+        document.getElementById('user-name').textContent = selectedUsername;
+        document.getElementById('profile-picture').src = selectedProfile;
+
+        const completedEvents = eventStatuses.filter(status => status === 'Completed').length;
+        const absentEvents = eventStatuses.filter(status => status === 'Absent').length;
+
+        document.querySelector(".stats div:nth-child(1)").innerHTML = `<strong>Events:</strong> ${eventNames.length}`;
+        document.querySelector(".stats div:nth-child(2)").innerHTML = `<strong>Completed:</strong> ${completedEvents}`;
+        document.querySelector(".stats div:nth-child(3)").innerHTML = `<strong>Absent:</strong> ${absentEvents}`;
+
+        const tableBody = document.getElementById('table-body');
+        tableBody.innerHTML = '';
+
+        eventNames.forEach((event, index) => {
+          const row = `<tr><td>${event}</td><td>${eventDates[index] || ''}</td><td>${eventStatuses[index] || 'Pending'}</td></tr>`;
+          tableBody.innerHTML += row;
+        });
+
+      } catch (error) {
+        console.error('Error fetching data:', error);
       }
-      
-      fetchData();
-      
-    
+    }
+
+    fetchData();
   </script>
 </body>
 </html>
