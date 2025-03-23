@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Viewport for mobile devices: ensures the page scales properly on phones -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>Digital NFC Activity Passport</title>
 
   <!-- Bootstrap CSS -->
@@ -98,6 +99,37 @@
       padding: 15px;
       margin-top: 30px;
       box-shadow: 0px -4px 10px rgba(0, 183, 255, 0.5);
+    }
+
+    /* Media Query for small devices */
+    @media (max-width: 600px) {
+      .container {
+        padding: 15px;
+      }
+
+      .profile-header img {
+        width: 120px;
+        height: 120px;
+      }
+
+      .profile-header h2 {
+        font-size: 1.5rem;
+      }
+
+      .stats {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .events-table th, .events-table td {
+        font-size: 0.9rem;
+        padding: 8px;
+      }
+
+      .footer {
+        font-size: 0.9rem;
+        padding: 10px;
+      }
     }
   </style>
 </head>
